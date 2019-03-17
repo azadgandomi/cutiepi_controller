@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">PiController</string>
+    <string name="up">up</string>
+    <string name="down">down</string>
+    <string name="rotate_clockwise">rotate clockwise</string>
+    <string name="rotate_anti_clockwise">rotate anti clockwise</string>
+    <string name="right">right</string>
+    <string name="left">left</string>
+</resources>
