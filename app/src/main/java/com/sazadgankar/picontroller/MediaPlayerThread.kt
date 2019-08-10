@@ -24,7 +24,7 @@ private class MediaPlayerThread(private val mediaPlayer: MediaPlayer, private va
     private fun connect() {
         val address = InetAddress.getByName(address)
         Log.i("MediaPlayerThread", "Connecting...")
-        socket = Socket(address, PORT_VIDEO)
+        socket = Socket(address, PORT_CAMERA)
         Log.i("MediaPlayerThread", "Connected!")
     }
 
