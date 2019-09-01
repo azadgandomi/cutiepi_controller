@@ -2,18 +2,17 @@ package com.sazadgankar.picontroller
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.media.MediaPlayer
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 import java.net.InetAddress
@@ -28,16 +27,16 @@ const val PORT_CAMERA = 45678
 class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.DiscoveryListener {
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
         Log.w("SurfaceHolder", "Surface Changed!")
+        mjpegPlayer.setDisplay(holder)
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
         Log.i("SurfaceHolder", "Surface Destroyed!")
-        mediaPlayer.setDisplay(null)
+        mjpegPlayer.setDisplay(null)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder?) {
         Log.i("SurfaceHolder", "Surface Created!")
-        mediaPlayer.setDisplay(holder)
     }
 
     private var hostAddress: InetAddress? = null
@@ -85,12 +84,13 @@ class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.Dis
 
     private lateinit var nsdManager: NsdManager
     private var commandThread: CommandThread? = null
-    private val mediaPlayer = MediaPlayer()
+    private var mjpegPlayer = MjpegPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupButtons()
+        surfaceView.holder.addCallback(this)
         nsdManager = getSystemService(Context.NSD_SERVICE) as NsdManager
     }
 
@@ -103,17 +103,17 @@ class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.Dis
                 nsdManager.discoverServices("_qtpie._tcp.", NsdManager.PROTOCOL_DNS_SD, this)
             }
         }
-        // TODO: surfaceView.holder.addCallback(this)
     }
 
     private fun connect(address: InetAddress) {
         commandThread = CommandThread(address)
-        commandThread!!.start()
+        commandThread?.start()
+        mjpegPlayer.start(address, PORT_CAMERA)
     }
 
     override fun onStop() {
         super.onStop()
-        mediaPlayer.release()
+        mjpegPlayer.close()
         commandThread?.close()
         try {
             nsdManager.stopServiceDiscovery(this)
@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.Dis
 
     private class CommandThread(private val address: InetAddress) : HandlerThread("CommandThread") {
         companion object {
-            const val Tag = "CommandThread"
+            const val TAG = "CommandThread"
         }
 
         var handler: Handler? = null
@@ -164,33 +164,33 @@ class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.Dis
                     try {
                         socket?.run {
                             if (isClosed or !isConnected) {
-                                Log.w(Tag, "Socket is closed!")
+                                Log.w(TAG, "Socket is closed!")
                                 connect()
                             }
-                            Log.i(Tag, "Sending: " + msg.obj.toString())
+                            Log.i(TAG, "Sending: " + msg.obj.toString())
                             outputStream.run {
                                 write(msg.obj.toString().toByteArray(Charsets.US_ASCII))
                                 flush()
                             }
                         }
                     } catch (exception: IOException) {
-                        Log.w(Tag, exception)
+                        Log.w(TAG, exception)
                     }
                 }
             }
             try {
                 connect()
             } catch (exception: IOException) {
-                Log.w(Tag, exception)
+                Log.w(TAG, exception)
             } catch (exception: SocketTimeoutException) {
-                Log.w(Tag, exception)
+                Log.w(TAG, exception)
             }
         }
 
         private fun connect() {
-            Log.i(Tag, "Connecting...")
+            Log.i(TAG, "Connecting...")
             socket = Socket(address, PORT_CONTROL)
-            Log.i(Tag, "Connected!")
+            Log.i(TAG, "Connected!")
         }
 
         fun close() {
