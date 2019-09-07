@@ -23,11 +23,11 @@ class MjpegPlayer :
 
     @Volatile
     private var surfaceHolder: SurfaceHolder? = null
-    @Volatile
-    private lateinit var address: InetAddress
-    @Volatile
+    private var address: InetAddress? = null
+    private var stringAddress: String? = null
     private var port: Int = 0
 
+    @Volatile
     private var inputStream: BufferedInputStream? = null
 
     fun setDisplay(holder: SurfaceHolder?) {
@@ -35,7 +35,9 @@ class MjpegPlayer :
     }
 
     private fun connect() {
-
+        if (address == null) {
+            address = InetAddress.getByName(stringAddress)
+        }
         Log.i(TAG, "Connecting...")
         val socket = Socket(address, port)
         Log.i(TAG, "Connected!")
@@ -44,6 +46,12 @@ class MjpegPlayer :
 
     fun start(address: InetAddress, port: Int) {
         this.address = address
+        this.port = port
+        super.start()
+    }
+
+    fun start(address: String, port: Int) {
+        this.stringAddress = address
         this.port = port
         super.start()
     }
@@ -76,12 +84,17 @@ class MjpegPlayer :
                                 surfaceHolder?.let { holder ->
                                     val jpegBytes = ByteBuffer.wrap(bytesBuffer.toByteArray())
                                     try {
-                                        val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(jpegBytes))
+                                        val bitmap = ImageDecoder.decodeBitmap(
+                                            ImageDecoder.createSource(jpegBytes)
+                                        )
                                         val canvas = holder.lockHardwareCanvas()
                                         canvas.drawBitmap(bitmap, null, holder.surfaceFrame, null)
                                         holder.unlockCanvasAndPost(canvas)
                                     } catch (exception: Exception) {
                                         Log.w(TAG, exception)
+                                        if (isInterrupted) {
+                                            return
+                                        }
                                     }
                                 }
                                 bytesBuffer.clear()

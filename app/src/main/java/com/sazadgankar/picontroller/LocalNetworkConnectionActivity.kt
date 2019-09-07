@@ -17,22 +17,18 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
-import java.net.SocketTimeoutException
 
 
-const val PORT_CONTROL = 56789
-const val PORT_CAMERA = 45678
-
-
-class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.DiscoveryListener {
+class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback,
+    NsdManager.DiscoveryListener {
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
         Log.w("SurfaceHolder", "Surface Changed!")
-        mjpegPlayer.setDisplay(holder)
+        mjpegPlayer?.setDisplay(holder)
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
         Log.i("SurfaceHolder", "Surface Destroyed!")
-        mjpegPlayer.setDisplay(null)
+        mjpegPlayer?.setDisplay(null)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder?) {
@@ -84,7 +80,7 @@ class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.Dis
 
     private lateinit var nsdManager: NsdManager
     private var commandThread: CommandThread? = null
-    private var mjpegPlayer = MjpegPlayer()
+    private var mjpegPlayer: MjpegPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,15 +102,21 @@ class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.Dis
     }
 
     private fun connect(address: InetAddress) {
-        commandThread = CommandThread(address)
-        commandThread?.start()
-        mjpegPlayer.start(address, PORT_CAMERA)
+        val cThread = CommandThread(address)
+        cThread.start()
+        commandThread = cThread
+        val player = MjpegPlayer()
+        player.setDisplay(surfaceView.holder)
+        player.start(address, PORT_CAMERA)
+        mjpegPlayer = player
     }
 
     override fun onStop() {
         super.onStop()
-        mjpegPlayer.close()
+        mjpegPlayer?.close()
+        mjpegPlayer = null
         commandThread?.close()
+        commandThread = null
         try {
             nsdManager.stopServiceDiscovery(this)
         } catch (exception: IllegalArgumentException) {
@@ -158,32 +160,27 @@ class MainActivity : AppCompatActivity(), SurfaceHolder.Callback, NsdManager.Dis
         private var socket: Socket? = null
 
         override fun onLooperPrepared() {
-            handler = object : Handler(looper) {
-                override fun handleMessage(msg: Message) {
-                    super.handleMessage(msg)
-                    try {
-                        socket?.run {
-                            if (isClosed or !isConnected) {
-                                Log.w(TAG, "Socket is closed!")
-                                connect()
-                            }
-                            Log.i(TAG, "Sending: " + msg.obj.toString())
-                            outputStream.run {
-                                write(msg.obj.toString().toByteArray(Charsets.US_ASCII))
-                                flush()
-                            }
-                        }
-                    } catch (exception: IOException) {
-                        Log.w(TAG, exception)
-                    }
-                }
-            }
             try {
                 connect()
+                handler = object : Handler(looper) {
+                    override fun handleMessage(msg: Message) {
+                        super.handleMessage(msg)
+                        try {
+                            socket?.run {
+                                Log.i(TAG, "Sending: " + msg.obj.toString())
+                                outputStream.run {
+                                    write(msg.obj.toString().toByteArray(Charsets.US_ASCII))
+                                    flush()
+                                }
+                            }
+                        } catch (exception: IOException) {
+                            Log.w(TAG, exception)
+                        }
+                    }
+                }
             } catch (exception: IOException) {
                 Log.w(TAG, exception)
-            } catch (exception: SocketTimeoutException) {
-                Log.w(TAG, exception)
+                close()
             }
         }
 

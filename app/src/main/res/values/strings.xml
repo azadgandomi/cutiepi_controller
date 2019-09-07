@@ -6,4 +6,6 @@
     <string name="rotate_anti_clockwise">rotate anti clockwise</string>
     <string name="right">right</string>
     <string name="left">left</string>
+    <string name="local_network_connection">Local Network Connection</string>
+    <string name="internet_connection">Internet Connection</string>
 </resources>

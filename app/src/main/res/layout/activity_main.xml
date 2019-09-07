@@ -1,102 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".LocalNetworkConnectionActivity">
 
     <SurfaceView
         android:id="@+id/surfaceView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent" />
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/turnLeftButton"
+        android:layout_width="70dp"
         android:layout_height="70dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:id="@+id/turnLeftButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:contentDescription="@string/left"
-            android:src="@drawable/up_left_50" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:id="@+id/turnRightButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:contentDescription="@string/right"
-            android:src="@drawable/up_right_50" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:id="@+id/rotateAntiClockwiseButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:contentDescription="@string/rotate_anti_clockwise"
-            android:src="@drawable/rotate_left_50" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:id="@+id/rotateClockwiseButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:contentDescription="@string/rotate_clockwise"
-            android:src="@drawable/rotate_right_50" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:id="@+id/goBackwardButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:contentDescription="@string/down"
-            android:src="@drawable/down_24" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:id="@+id/goForwardButton"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:contentDescription="@string/up"
-            android:src="@drawable/up_24" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-    </LinearLayout>
+        android:contentDescription="@string/left"
+        android:padding="20dp"
+        android:src="@drawable/up_left_50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/turnRightButton" />
 
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/turnRightButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:contentDescription="@string/right"
+        android:padding="20dp"
+        android:src="@drawable/up_right_50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/turnLeftButton"
+        app:layout_constraintRight_toLeftOf="@id/rotateAntiClockwiseButton" />
+
+
+    <ImageView
+        android:id="@+id/rotateAntiClockwiseButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:contentDescription="@string/rotate_anti_clockwise"
+        android:padding="20dp"
+        android:src="@drawable/rotate_left_50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/turnRightButton"
+        app:layout_constraintRight_toLeftOf="@id/rotateClockwiseButton" />
+
+    <ImageView
+        android:id="@+id/rotateClockwiseButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:contentDescription="@string/rotate_clockwise"
+        android:padding="20dp"
+        android:src="@drawable/rotate_right_50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/rotateAntiClockwiseButton"
+        app:layout_constraintRight_toLeftOf="@id/goBackwardButton" />
+
+
+    <ImageView
+        android:id="@+id/goBackwardButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:contentDescription="@string/down"
+        android:padding="20dp"
+        android:src="@drawable/down_50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/rotateClockwiseButton"
+        app:layout_constraintRight_toLeftOf="@id/goForwardButton" />
+
+
+    <ImageView
+        android:id="@+id/goForwardButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:contentDescription="@string/up"
+        android:padding="20dp"
+        android:src="@drawable/up_50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/goBackwardButton"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
