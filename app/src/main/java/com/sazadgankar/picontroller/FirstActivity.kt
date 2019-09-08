@@ -12,10 +12,12 @@ class FirstActivity : AppCompatActivity() {
         setContentView(R.layout.activity_first)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun startLocalNetworkActivity(view: View) {
         startActivity(Intent(this, LocalNetworkConnectionActivity::class.java))
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun startInternetActivity(view: View) {
         startActivity(Intent(this, InternetConnectionActivity::class.java))
     }
