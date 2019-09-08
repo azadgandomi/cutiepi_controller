@@ -144,7 +144,7 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
             } else if (event.action == MotionEvent.ACTION_UP) {
                 Log.v("TOUCH", "Up: $command")
                 val message = Message.obtain()
-                message.obj = "S"
+                message.obj = "ST"
                 commandThread?.handler?.sendMessage(message)
             }
             return false
