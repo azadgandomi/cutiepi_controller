@@ -9,6 +9,7 @@
 
     <SurfaceView
         android:id="@+id/surfaceView"
+        android:keepScreenOn="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -18,7 +19,7 @@
         android:layout_height="70dp"
         android:contentDescription="@string/left"
         android:padding="20dp"
-        android:src="@drawable/up_left_50"
+        android:src="@drawable/up_left_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/turnRightButton" />
@@ -30,7 +31,7 @@
         android:layout_height="70dp"
         android:contentDescription="@string/right"
         android:padding="20dp"
-        android:src="@drawable/up_right_50"
+        android:src="@drawable/up_right_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/turnLeftButton"
         app:layout_constraintRight_toLeftOf="@id/rotateAntiClockwiseButton" />
@@ -42,7 +43,7 @@
         android:layout_height="70dp"
         android:contentDescription="@string/rotate_anti_clockwise"
         android:padding="20dp"
-        android:src="@drawable/rotate_left_50"
+        android:src="@drawable/rotate_left_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/turnRightButton"
         app:layout_constraintRight_toLeftOf="@id/rotateClockwiseButton" />
@@ -53,7 +54,7 @@
         android:layout_height="70dp"
         android:contentDescription="@string/rotate_clockwise"
         android:padding="20dp"
-        android:src="@drawable/rotate_right_50"
+        android:src="@drawable/rotate_right_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/rotateAntiClockwiseButton"
         app:layout_constraintRight_toLeftOf="@id/goBackwardButton" />
@@ -65,7 +66,7 @@
         android:layout_height="70dp"
         android:contentDescription="@string/down"
         android:padding="20dp"
-        android:src="@drawable/down_50"
+        android:src="@drawable/down_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/rotateClockwiseButton"
         app:layout_constraintRight_toLeftOf="@id/goForwardButton" />
@@ -77,7 +78,7 @@
         android:layout_height="70dp"
         android:contentDescription="@string/up"
         android:padding="20dp"
-        android:src="@drawable/up_50"
+        android:src="@drawable/up_64"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/goBackwardButton"
         app:layout_constraintRight_toRightOf="parent" />
