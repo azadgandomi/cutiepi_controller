@@ -2,6 +2,7 @@ package com.sazadgankar.picontroller
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class FirstActivity : AppCompatActivity() {
@@ -11,11 +12,11 @@ class FirstActivity : AppCompatActivity() {
         setContentView(R.layout.activity_first)
     }
 
-    fun startLocalNetworkActivity() {
+    fun startLocalNetworkActivity(view: View) {
         startActivity(Intent(this, LocalNetworkConnectionActivity::class.java))
     }
 
-    fun startInternetActivity() {
+    fun startInternetActivity(view: View) {
         startActivity(Intent(this, InternetConnectionActivity::class.java))
     }
 }
