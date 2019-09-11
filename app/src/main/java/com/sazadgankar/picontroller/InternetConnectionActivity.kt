@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
 import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
@@ -13,8 +11,6 @@ import android.view.SurfaceHolder
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.IOException
-import java.net.Socket
 
 class InternetConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback {
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
@@ -32,7 +28,7 @@ class InternetConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback {
     }
 
     private lateinit var nsdManager: NsdManager
-    private var commandThread: CommandThread? = null
+    private var commandThread: Controller? = null
     private var mjpegPlayer = MjpegPlayer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +42,7 @@ class InternetConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback {
     override fun onStart() {
         super.onStart()
 
-        commandThread = CommandThread(INTERNET_ADDRESS)
+        commandThread = Controller(INTERNET_ADDRESS)
         commandThread?.start()
         mjpegPlayer.start(INTERNET_ADDRESS, PORT_CAMERA)
     }
@@ -82,51 +78,6 @@ class InternetConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback {
                 commandThread?.handler?.sendMessage(message)
             }
             return false
-        }
-    }
-
-    private class CommandThread(private val address: String) : HandlerThread("CommandThread") {
-        companion object {
-            const val TAG = "CommandThread"
-        }
-
-        var handler: Handler? = null
-        private var socket: Socket? = null
-
-        override fun onLooperPrepared() {
-            try {
-                connect()
-                handler = object : Handler(looper) {
-                    override fun handleMessage(msg: Message) {
-                        super.handleMessage(msg)
-                        try {
-                            socket?.run {
-                                Log.i(TAG, "Sending: " + msg.obj.toString())
-                                outputStream.run {
-                                    write(msg.obj.toString().toByteArray(Charsets.US_ASCII))
-                                    flush()
-                                }
-                            }
-                        } catch (exception: IOException) {
-                            Log.w(TAG, exception)
-                        }
-                    }
-                }
-            } catch (exception: IOException) {
-                Log.w(TAG, exception)
-                close()
-            }
-        }
-
-        private fun connect() {
-            Log.i(TAG, "Connecting...")
-            socket = Socket(address, PORT_CONTROL)
-            Log.i(TAG, "Connected!")
-        }
-
-        fun close() {
-            quit()
-            socket?.close()
         }
     }
 }

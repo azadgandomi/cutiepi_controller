@@ -6,7 +6,6 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.os.Handler
-import android.os.HandlerThread
 import android.os.Message
 import android.util.Log
 import android.view.MotionEvent
@@ -14,9 +13,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.IOException
 import java.net.InetAddress
-import java.net.Socket
 
 
 class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback,
@@ -79,7 +76,7 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
     }
 
     private lateinit var nsdManager: NsdManager
-    private var commandThread: CommandThread? = null
+    private var controller: Controller? = null
     private var mjpegPlayer: MjpegPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,9 +99,9 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
     }
 
     private fun connect(address: InetAddress) {
-        val cThread = CommandThread(address)
+        val cThread = Controller(address)
         cThread.start()
-        commandThread = cThread
+        controller = cThread
         val player = MjpegPlayer()
         player.setDisplay(surfaceView.holder)
         player.start(address, PORT_CAMERA)
@@ -115,8 +112,8 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
         super.onStop()
         mjpegPlayer?.close()
         mjpegPlayer = null
-        commandThread?.close()
-        commandThread = null
+        controller?.close()
+        controller = null
         try {
             nsdManager.stopServiceDiscovery(this)
         } catch (exception: IllegalArgumentException) {
@@ -140,59 +137,14 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
                 Log.v("TOUCH", "Down: $command")
                 val message = Message.obtain()
                 message.obj = command
-                commandThread?.handler?.sendMessage(message)
+                controller?.handler?.sendMessage(message)
             } else if (event.action == MotionEvent.ACTION_UP) {
                 Log.v("TOUCH", "Up: $command")
                 val message = Message.obtain()
                 message.obj = "ST"
-                commandThread?.handler?.sendMessage(message)
+                controller?.handler?.sendMessage(message)
             }
             return false
-        }
-    }
-
-    private class CommandThread(private val address: InetAddress) : HandlerThread("CommandThread") {
-        companion object {
-            const val TAG = "CommandThread"
-        }
-
-        var handler: Handler? = null
-        private var socket: Socket? = null
-
-        override fun onLooperPrepared() {
-            try {
-                connect()
-                handler = object : Handler(looper) {
-                    override fun handleMessage(msg: Message) {
-                        super.handleMessage(msg)
-                        try {
-                            socket?.run {
-                                Log.i(TAG, "Sending: " + msg.obj.toString())
-                                outputStream.run {
-                                    write(msg.obj.toString().toByteArray(Charsets.US_ASCII))
-                                    flush()
-                                }
-                            }
-                        } catch (exception: IOException) {
-                            Log.w(TAG, exception)
-                        }
-                    }
-                }
-            } catch (exception: IOException) {
-                Log.w(TAG, exception)
-                close()
-            }
-        }
-
-        private fun connect() {
-            Log.i(TAG, "Connecting...")
-            socket = Socket(address, PORT_CONTROL)
-            Log.i(TAG, "Connected!")
-        }
-
-        fun close() {
-            quit()
-            socket?.close()
         }
     }
 }
