@@ -1,83 +1,105 @@
 package com.sazadgankar.picontroller
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.net.nsd.NsdManager
+import android.os.AsyncTask
 import android.os.Bundle
-import android.os.Message
 import android.util.Log
-import android.view.MotionEvent
 import android.view.SurfaceHolder
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import java.net.InetAddress
 
 class InternetConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback {
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
         Log.w("SurfaceHolder", "Surface Changed!")
-        mjpegPlayer.setDisplay(holder)
+        mjpegPlayer?.setDisplay(holder)
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
         Log.i("SurfaceHolder", "Surface Destroyed!")
-        mjpegPlayer.setDisplay(null)
+        mjpegPlayer?.setDisplay(null)
+        surfaceHolder = null
     }
 
     override fun surfaceCreated(holder: SurfaceHolder?) {
         Log.i("SurfaceHolder", "Surface Created!")
+        surfaceHolder = holder
     }
 
-    private lateinit var nsdManager: NsdManager
-    private var commandThread: Controller? = null
-    private var mjpegPlayer = MjpegPlayer()
+    private var addressResolverTask: AddressResolverTask? = null
+    private var hostAddress: InetAddress? = null
+    private var controller: Controller? = null
+    private var mjpegPlayer: MjpegPlayer? = null
+    private var surfaceHolder: SurfaceHolder? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setupButtons()
         surfaceView.holder.addCallback(this)
-        nsdManager = getSystemService(Context.NSD_SERVICE) as NsdManager
     }
 
     override fun onStart() {
         super.onStart()
+        hostAddress.let { address ->
+            if (address != null) {
+                connect(address)
+            } else {
+                val resolverTask = AddressResolverTask()
+                resolverTask.execute(HOST_NAME)
+                addressResolverTask = resolverTask
+            }
+        }
+    }
 
-        commandThread = Controller(INTERNET_ADDRESS)
-        commandThread?.start()
-        mjpegPlayer.start(INTERNET_ADDRESS, PORT_CAMERA)
+    private fun connect(address: InetAddress) {
+        val cThread = Controller(address)
+        cThread.start()
+        setupUiListeners(cThread)
+        controller = cThread
+        val player = MjpegPlayer(address, PORT_CAMERA)
+        player.setDisplay(surfaceHolder)
+        player.start()
+        mjpegPlayer = player
     }
 
     override fun onStop() {
         super.onStop()
-        mjpegPlayer.close()
-        commandThread?.close()
+        removeUiListeners()
+        mjpegPlayer?.close()
+        mjpegPlayer = null
+        controller?.close()
+        controller = null
+        addressResolverTask?.cancel(true)
+        addressResolverTask = null
     }
 
-    private fun setupButtons() {
-        goForwardButton.setOnTouchListener(NavigationOnTouchListener("GF"))
-        goBackwardButton.setOnTouchListener(NavigationOnTouchListener("GB"))
-        turnRightButton.setOnTouchListener(NavigationOnTouchListener("TR"))
-        turnLeftButton.setOnTouchListener(NavigationOnTouchListener("TL"))
-        rotateClockwiseButton.setOnTouchListener(NavigationOnTouchListener("RC"))
-        rotateAntiClockwiseButton.setOnTouchListener(NavigationOnTouchListener("RA"))
+    private fun setupUiListeners(controller: Controller) {
+        goForwardButton.setOnTouchListener(NavigationOnTouchListener(controller, "GF"))
+        goBackwardButton.setOnTouchListener(NavigationOnTouchListener(controller, "GB"))
+        turnRightButton.setOnTouchListener(NavigationOnTouchListener(controller, "TR"))
+        turnLeftButton.setOnTouchListener(NavigationOnTouchListener(controller, "TL"))
+        rotateClockwiseButton.setOnTouchListener(NavigationOnTouchListener(controller, "RC"))
+        rotateAntiClockwiseButton.setOnTouchListener(NavigationOnTouchListener(controller, "RA"))
     }
 
-    private inner class NavigationOnTouchListener(private val command: String) :
-        View.OnTouchListener {
-        @SuppressLint("ClickableViewAccessibility")
-        override fun onTouch(v: View?, event: MotionEvent): Boolean {
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                Log.v("TOUCH", "Down: $command")
-                val message = Message.obtain()
-                message.obj = command
-                commandThread?.handler?.sendMessage(message)
-            } else if (event.action == MotionEvent.ACTION_UP) {
-                Log.v("TOUCH", "Up: $command")
-                val message = Message.obtain()
-                message.obj = "ST"
-                commandThread?.handler?.sendMessage(message)
-            }
-            return false
+    private fun removeUiListeners() {
+        goForwardButton.setOnTouchListener(null)
+        goBackwardButton.setOnTouchListener(null)
+        turnRightButton.setOnTouchListener(null)
+        turnLeftButton.setOnTouchListener(null)
+        rotateClockwiseButton.setOnTouchListener(null)
+        rotateAntiClockwiseButton.setOnTouchListener(null)
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class AddressResolverTask : AsyncTask<String, Void, InetAddress>() {
+        override fun doInBackground(vararg params: String?): InetAddress {
+            return InetAddress.getByName(params[0])
+        }
+
+        override fun onPostExecute(result: InetAddress?) {
+            connect(result!!)
         }
     }
+
 }

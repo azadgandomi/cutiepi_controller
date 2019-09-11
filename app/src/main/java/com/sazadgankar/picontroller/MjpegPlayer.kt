@@ -10,7 +10,7 @@ import java.net.Socket
 import java.nio.ByteBuffer
 
 
-class MjpegPlayer :
+class MjpegPlayer(private val address: InetAddress, private val port: Int) :
     Thread(), AutoCloseable {
     companion object {
         const val TAG = "MjpegPlayer"
@@ -23,9 +23,6 @@ class MjpegPlayer :
 
     @Volatile
     private var surfaceHolder: SurfaceHolder? = null
-    private var address: InetAddress? = null
-    private var stringAddress: String? = null
-    private var port: Int = 0
 
     @Volatile
     private var inputStream: BufferedInputStream? = null
@@ -35,25 +32,10 @@ class MjpegPlayer :
     }
 
     private fun connect() {
-        if (address == null) {
-            address = InetAddress.getByName(stringAddress)
-        }
         Log.i(TAG, "Connecting...")
         val socket = Socket(address, port)
         Log.i(TAG, "Connected!")
         inputStream = socket.getInputStream().buffered()
-    }
-
-    fun start(address: InetAddress, port: Int) {
-        this.address = address
-        this.port = port
-        super.start()
-    }
-
-    fun start(address: String, port: Int) {
-        this.stringAddress = address
-        this.port = port
-        super.start()
     }
 
     override fun run() {
