@@ -60,7 +60,17 @@ class PowerBar : SeekBar {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
                 progress = max - (max * event.y / height).toInt()
                 onSizeChanged(width, height, 0, 0)
+            }
+        }
+
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
 //                progressTintList = ColorStateList.valueOf(resources.getColor(R.color.buttonsActiveColor))
+            }
+
+            MotionEvent.ACTION_UP -> {
+//                progressTintList = ColorStateList.valueOf(white))
+                //TODO: Set power
             }
         }
         return true
