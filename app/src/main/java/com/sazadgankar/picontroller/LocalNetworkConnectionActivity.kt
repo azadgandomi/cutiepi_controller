@@ -104,37 +104,13 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
     }
 
     private fun setupUiListeners(controller: Controller) {
-        goForwardButton.setOnTouchListener(
-            NavigationOnTouchListener(
-                controller,
-                GO_FORWARD_MESSAGE
-            )
-        )
-        goBackwardButton.setOnTouchListener(
-            NavigationOnTouchListener(
-                controller,
-                GO_BACKWARD_MESSAGE
-            )
-        )
-        turnRightButton.setOnTouchListener(
-            NavigationOnTouchListener(
-                controller,
-                TURN_RIGHT_MESSAGE
-            )
-        )
+        goForwardButton.setOnTouchListener(NavigationOnTouchListener(controller, GO_FORWARD_MESSAGE))
+        goBackwardButton.setOnTouchListener(NavigationOnTouchListener(controller, GO_BACKWARD_MESSAGE))
+        turnRightButton.setOnTouchListener(NavigationOnTouchListener(controller, TURN_RIGHT_MESSAGE))
         turnLeftButton.setOnTouchListener(NavigationOnTouchListener(controller, TURN_LEFT_MESSAGE))
-        rotateClockwiseButton.setOnTouchListener(
-            NavigationOnTouchListener(
-                controller,
-                ROTATE_CLOCKWISE_MESSAGE
-            )
-        )
-        rotateAntiClockwiseButton.setOnTouchListener(
-            NavigationOnTouchListener(
-                controller,
-                ROTATE_ANTI_CLOCKWISE_MESSAGE
-            )
-        )
+        rotateClockwiseButton.setOnTouchListener(NavigationOnTouchListener(controller, ROTATE_CLOCKWISE_MESSAGE))
+        rotateAntiClockwiseButton.setOnTouchListener(NavigationOnTouchListener(controller, ROTATE_ANTI_CLOCKWISE_MESSAGE))
+        powerBar.powerChangeListener = PowerChangeListener(controller)
     }
 
     private fun removeUiListeners() {
@@ -144,5 +120,6 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
         turnLeftButton.setOnTouchListener(null)
         rotateClockwiseButton.setOnTouchListener(null)
         rotateAntiClockwiseButton.setOnTouchListener(null)
+        powerBar.powerChangeListener = null
     }
 }
