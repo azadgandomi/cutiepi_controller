@@ -74,13 +74,13 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
             if (address != null) {
                 connect(address)
             } else {
-                nsdManager.discoverServices("_qtpie._tcp.", NsdManager.PROTOCOL_DNS_SD, this)
+                nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, this)
             }
         }
     }
 
     private fun connect(address: InetAddress) {
-        val cThread = Controller(address)
+        val cThread = Controller(address, powerBar)
         cThread.start()
         setupUiListeners(cThread)
         controller = cThread

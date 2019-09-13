@@ -10,14 +10,14 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
+        android:layout_margin="10dp"
         android:onClick="startLocalNetworkActivity"
         android:text="@string/local_network_connection" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
+        android:layout_margin="10dp"
         android:onClick="startInternetActivity"
         android:text="@string/internet_connection" />
 

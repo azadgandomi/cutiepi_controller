@@ -52,7 +52,7 @@ class InternetConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback {
     }
 
     private fun connect(address: InetAddress) {
-        val cThread = Controller(address)
+        val cThread = Controller(address, powerBar)
         cThread.start()
         setupUiListeners(cThread)
         controller = cThread
@@ -80,6 +80,7 @@ class InternetConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback {
         turnLeftButton.setOnTouchListener(NavigationOnTouchListener(controller, "TL"))
         rotateClockwiseButton.setOnTouchListener(NavigationOnTouchListener(controller, "RC"))
         rotateAntiClockwiseButton.setOnTouchListener(NavigationOnTouchListener(controller, "RA"))
+        powerBar.powerChangeListener = PowerChangeListener(controller)
     }
 
     private fun removeUiListeners() {
@@ -89,6 +90,7 @@ class InternetConnectionActivity : AppCompatActivity(), SurfaceHolder.Callback {
         turnLeftButton.setOnTouchListener(null)
         rotateClockwiseButton.setOnTouchListener(null)
         rotateAntiClockwiseButton.setOnTouchListener(null)
+        powerBar.powerChangeListener = null
     }
 
     @SuppressLint("StaticFieldLeak")

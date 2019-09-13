@@ -2,18 +2,23 @@ package android.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
+import com.sazadgankar.picontroller.PowerChangeListener
+import com.sazadgankar.picontroller.R
+
 
 class PowerBar : SeekBar {
-
-    private val paint = Paint()
+    var powerChangeListener: PowerChangeListener? = null
+    private val transparentPaint = Paint()
 
     init {
-        paint.setARGB(128, 255, 255, 255)
-        paint.strokeWidth = 4f
+        transparentPaint.setARGB(128, 255, 255, 255)
+        transparentPaint.strokeWidth = 4f
     }
 
     constructor(context: Context) : super(context)
@@ -43,7 +48,7 @@ class PowerBar : SeekBar {
             paddingRight.toFloat(),
             width.toFloat() / 2,
             height.toFloat() - paddingLeft,
-            paint
+            transparentPaint
         )
         c.rotate(-90f)
         c.translate((-height).toFloat(), 0f)
@@ -59,21 +64,27 @@ class PowerBar : SeekBar {
         when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
                 progress = max - (max * event.y / height).toInt()
-                onSizeChanged(width, height, 0, 0)
             }
         }
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-//                progressTintList = ColorStateList.valueOf(resources.getColor(R.color.buttonsActiveColor))
+                thumbTintList =
+                    ColorStateList.valueOf(resources.getColor(R.color.colorAccent, null))
             }
 
             MotionEvent.ACTION_UP -> {
-//                progressTintList = ColorStateList.valueOf(white))
-                //TODO: Set power
+                thumbTintList = ColorStateList.valueOf(Color.WHITE)
+                powerChangeListener?.onPowerChange(progress)
             }
         }
         return true
     }
 
+
+    @Synchronized
+    override fun setProgress(progress: Int) {
+        super.setProgress(progress)
+        onSizeChanged(width, height, 0, 0)
+    }
 }

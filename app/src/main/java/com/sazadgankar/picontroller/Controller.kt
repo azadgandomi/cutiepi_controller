@@ -4,11 +4,13 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.Log
+import android.widget.PowerBar
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
 
-class Controller(private val address: InetAddress) : HandlerThread("Controller") {
+class Controller(private val address: InetAddress, private var powerBar: PowerBar) :
+    HandlerThread("Controller") {
     companion object {
         const val TAG = "Controller"
     }
@@ -19,14 +21,19 @@ class Controller(private val address: InetAddress) : HandlerThread("Controller")
     override fun onLooperPrepared() {
         try {
             connect()
+            val power = socket?.getInputStream()?.read() ?: 0
+            Log.i(TAG, "Default power is $power")
+            powerBar.post {
+                powerBar.progress = power
+            }
             handler = object : Handler(looper) {
                 override fun handleMessage(msg: Message) {
                     super.handleMessage(msg)
                     try {
                         socket?.run {
-                            Log.i(TAG, "Sending: " + msg.obj.toString())
+                            Log.i(TAG, "Sending: " + (msg.obj as ByteArray).contentToString())
                             outputStream.run {
-                                write(msg.obj.toString().toByteArray(Charsets.US_ASCII))
+                                write(msg.obj as ByteArray)
                                 flush()
                             }
                         }
