@@ -104,12 +104,37 @@ class LocalNetworkConnectionActivity : AppCompatActivity(), SurfaceHolder.Callba
     }
 
     private fun setupUiListeners(controller: Controller) {
-        goForwardButton.setOnTouchListener(NavigationOnTouchListener(controller, "GF"))
-        goBackwardButton.setOnTouchListener(NavigationOnTouchListener(controller, "GB"))
-        turnRightButton.setOnTouchListener(NavigationOnTouchListener(controller, "TR"))
-        turnLeftButton.setOnTouchListener(NavigationOnTouchListener(controller, "TL"))
-        rotateClockwiseButton.setOnTouchListener(NavigationOnTouchListener(controller, "RC"))
-        rotateAntiClockwiseButton.setOnTouchListener(NavigationOnTouchListener(controller, "RA"))
+        goForwardButton.setOnTouchListener(
+            NavigationOnTouchListener(
+                controller,
+                GO_FORWARD_MESSAGE
+            )
+        )
+        goBackwardButton.setOnTouchListener(
+            NavigationOnTouchListener(
+                controller,
+                GO_BACKWARD_MESSAGE
+            )
+        )
+        turnRightButton.setOnTouchListener(
+            NavigationOnTouchListener(
+                controller,
+                TURN_RIGHT_MESSAGE
+            )
+        )
+        turnLeftButton.setOnTouchListener(NavigationOnTouchListener(controller, TURN_LEFT_MESSAGE))
+        rotateClockwiseButton.setOnTouchListener(
+            NavigationOnTouchListener(
+                controller,
+                ROTATE_CLOCKWISE_MESSAGE
+            )
+        )
+        rotateAntiClockwiseButton.setOnTouchListener(
+            NavigationOnTouchListener(
+                controller,
+                ROTATE_ANTI_CLOCKWISE_MESSAGE
+            )
+        )
     }
 
     private fun removeUiListeners() {

@@ -10,10 +10,10 @@ class PowerChangeListener(private val controller: Controller) {
     }
 
     fun onPowerChange(power: Int) {
-        Log.v(TAG, "power: $power")
+        Log.v(TAG, "Power: $power")
         val message = Message.obtain()
         message.obj = ByteArray(2).apply {
-            set(0, 'P'.toByte())
+            set(0, POWER_MESSAGE_INDICATOR)
             set(1, power.toByte())
         }
         controller.handler?.sendMessage(message)
