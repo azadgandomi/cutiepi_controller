@@ -10,7 +10,7 @@ import java.net.Socket
 import java.nio.ByteBuffer
 
 
-class MjpegPlayer(private val address: InetAddress, private val port: Int) :
+class MjpegPlayer(private val surfaceHolder: SurfaceHolder, private val address: InetAddress, private val port: Int) :
     Thread(), AutoCloseable {
     companion object {
         const val TAG = "MjpegPlayer"
@@ -20,16 +20,8 @@ class MjpegPlayer(private val address: InetAddress, private val port: Int) :
         const val JPEG_END_MARKER = 0xD9.toByte()
     }
 
-
-    @Volatile
-    private var surfaceHolder: SurfaceHolder? = null
-
-    @Volatile
     private var inputStream: BufferedInputStream? = null
 
-    fun setDisplay(holder: SurfaceHolder?) {
-        surfaceHolder = holder
-    }
 
     private fun connect() {
         Log.i(TAG, "Connecting...")
@@ -63,22 +55,22 @@ class MjpegPlayer(private val address: InetAddress, private val port: Int) :
                             JPEG_END_MARKER -> {
                                 bytesBuffer.add(nextByte)
                                 // End of a jpeg, decode and show it
-                                surfaceHolder?.let { holder ->
-                                    val jpegBytes = ByteBuffer.wrap(bytesBuffer.toByteArray())
-                                    try {
-                                        val bitmap = ImageDecoder.decodeBitmap(
-                                            ImageDecoder.createSource(jpegBytes)
-                                        )
-                                        val canvas = holder.lockHardwareCanvas()
-                                        canvas.drawBitmap(bitmap, null, holder.surfaceFrame, null)
-                                        holder.unlockCanvasAndPost(canvas)
-                                    } catch (exception: Exception) {
-                                        Log.w(TAG, exception)
-                                        if (isInterrupted) {
-                                            return
-                                        }
+
+                                val jpegBytes = ByteBuffer.wrap(bytesBuffer.toByteArray())
+                                try {
+                                    val bitmap = ImageDecoder.decodeBitmap(
+                                        ImageDecoder.createSource(jpegBytes)
+                                    )
+                                    val canvas = surfaceHolder.lockHardwareCanvas()
+                                    canvas.drawBitmap(bitmap, null, surfaceHolder.surfaceFrame, null)
+                                    surfaceHolder.unlockCanvasAndPost(canvas)
+                                } catch (exception: Exception) {
+                                    Log.w(TAG, exception)
+                                    if (isInterrupted) {
+                                        return
                                     }
                                 }
+
                                 bytesBuffer.clear()
                                 isInFrame = false
                             }

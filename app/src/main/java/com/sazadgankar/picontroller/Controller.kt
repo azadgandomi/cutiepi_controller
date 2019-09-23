@@ -4,12 +4,13 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.Log
+import android.view.SurfaceHolder
 import android.widget.PowerBar
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
 
-class Controller(private val address: InetAddress, private var powerBar: PowerBar) :
+class Controller(private val address: InetAddress, private val surfaceHolder: SurfaceHolder, private var powerBar: PowerBar) :
     HandlerThread("Controller") {
     companion object {
         const val TAG = "Controller"
@@ -17,6 +18,8 @@ class Controller(private val address: InetAddress, private var powerBar: PowerBa
 
     var handler: Handler? = null
     private var socket: Socket? = null
+    private var mjpegPlayer: MjpegPlayer? = null
+
 
     override fun onLooperPrepared() {
         try {
@@ -42,6 +45,9 @@ class Controller(private val address: InetAddress, private var powerBar: PowerBa
                     }
                 }
             }
+            val player = MjpegPlayer(surfaceHolder, address, PORT_CAMERA)
+            player.start()
+            mjpegPlayer = player
         } catch (exception: IOException) {
             Log.w(TAG, exception)
             close()
@@ -57,5 +63,7 @@ class Controller(private val address: InetAddress, private var powerBar: PowerBa
     fun close() {
         quit()
         socket?.close()
+        mjpegPlayer?.close()
+        mjpegPlayer = null
     }
 }
