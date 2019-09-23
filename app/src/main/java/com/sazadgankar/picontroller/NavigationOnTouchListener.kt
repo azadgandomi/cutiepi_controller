@@ -12,7 +12,6 @@ class NavigationOnTouchListener(
 ) : View.OnTouchListener {
 
     companion object {
-        const val TAG = "NavigationOnTouchListener"
         val commandHistory = Stack<String>()
     }
 

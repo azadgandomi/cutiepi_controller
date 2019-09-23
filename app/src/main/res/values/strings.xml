@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PiController</string>
+    <string name="app_name">CutieController</string>
     <string name="up">up</string>
     <string name="down">down</string>
     <string name="rotate_clockwise">rotate clockwise</string>
