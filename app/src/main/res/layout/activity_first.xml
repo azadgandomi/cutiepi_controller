@@ -11,6 +11,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:onClick="getSshKey"
+        android:text="@string/get_ssh_key" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:onClick="startCutiePi"
+        android:text="@string/start_cutiepi" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:onClick="startLocalNetworkActivity"
         android:text="@string/local_network_connection" />
 
