@@ -6,6 +6,8 @@ package com.sazadgankar.picontroller
 const val PORT_CONTROL = 56789
 const val PORT_CAMERA = 45678
 
+const val SSH_KEY_PAIR_ALIAS = "SshKeyPair"
+
 const val STOP_MESSAGE = "ST"
 const val GO_FORWARD_MESSAGE = "GF"
 const val GO_BACKWARD_MESSAGE = "GB"
